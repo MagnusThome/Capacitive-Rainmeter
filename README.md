@@ -15,7 +15,7 @@ Why a capacitive sensor? I've used those common resistive sensors that have copp
 
 - What sensor temperature is best? I guess the optimal is when it is warm enough to help dry off rain so when the rain stops the sensor will report "no rain" in a decent amount of time?
 
-- Is the reported value very unlinear? I suspect it might be. If a very slight drizzle is 50 but heavy rain is 10 000 I need to convert the output to be more linear.
+- Is the reported value very unlinear? I suspect it might be. If a very slight drizzle is 100 but heavy rain is 10 000 I need to convert the output to be more linear.
 
 - work in progress....
 
