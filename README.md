@@ -20,4 +20,4 @@ https://radiocontrolli.eu/Capacitive-Rain-Sensor-RC-SPC1K-p242943346
 
 ![arm open](https://github.com/MagnusThome/Capacitive-Rainmeter/assets/32169384/7e2d9be2-ed48-42fb-946f-4e2924a92be1)
 
-![PXL_20231102_185926488](https://github.com/MagnusThome/Capacitive-Rainmeter/assets/32169384/c5bd51ff-b108-49df-bd59-218a4ec83ed2)
+![schema](https://github.com/MagnusThome/Capacitive-Rainmeter/assets/32169384/2cf65521-ba4e-4b0e-887e-84a0da4d858c)
