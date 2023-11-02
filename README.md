@@ -7,6 +7,9 @@ The sensor heater runs on 12V so that is the voltage you need to supply. Any ESP
 
 The code as it is now keeps the sensor at around 35 degrees celsius. I don't know if that's the optimal temperature to for example keep snow melting and drying of rain not too fast and not too slow. I have a sensor installed and log it in Homeassistant and I might tweak the code as time goes by.
 
+Why a capacitive sensor? I've used these common resistive sensors that have copper traces that the rain falls on. The problem is these boards tend to wear down after a while due to oxidization. There are tricks to minimze the problems, reducing the current and the time current is flowing, but in the end you still have metal and electical current in a harsh environment. But a capactivie sensor is totally electrically isolated from the rain and dampness. No external parts of metal, removing any wear or tear in an outdoor environment.   
+
+
 work in progress....
 
 
