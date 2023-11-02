@@ -11,7 +11,7 @@ Why a capacitive sensor? I've used those common resistive sensors that have copp
 
 ## Things to find out
 
-- Should the sensor be mounted 100% horizontal or should it be tilted slightly? Will how it is mounted change - or not - if rain accumulates and stays long after it has stopped raining?
+- Should the sensor be mounted 100% horizontal or should it be tilted slightly? Will how it is mounted change if rain accumulates and stays long after it has stopped raining?
 
 - What sensor temperature is best? I guess the optimal is when it is warm enough to help dry off rain so when the rain stops the sensor will report no rain in a decent amount of time?
 
