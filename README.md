@@ -9,8 +9,15 @@ The code as it is now keeps the sensor at around 35 degrees Celsius. I don't kno
 
 Why a capacitive sensor? I've used those common resistive sensors that have copper traces that the rain falls on. The problem is these boards tend to wear down after a while due to oxidization. There are tricks to minimize the problems, reducing the current and the time current is flowing, but in the end you still have metal and electrical current in a harsh environment. But a capacitive sensor is totally electrically isolated from the rain and dampness. No external parts of metal, removing any wear or tear in an outdoor environment.   
 
+# Things to find out
 
-work in progress....
+- Should the sensor be mounted 100% horizontal or should it be tilted slightly? Will how it is mounted change - or not - if rain accumulates and stays long after it has stopped raining?
+
+- What sensor temperature is best? I guess the optimal is when it is warm enough to help dry off rain so when the rain stops the sensor will report no rain in a decent amount of time?
+
+- Is the reported value very unlinear? I suspect it might be. If a very slight drizzle is 50 but heavy rain is 10 000 I need to convert the output to be more linear.
+
+- work in progress....
 
 
 The sensor:
