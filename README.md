@@ -3,6 +3,8 @@ Measure rain intensity in Homeassistant with a capacitive sensor
 
 The code uses mqtt to send data and also self register the sensor in Homeassistant. 
 
+The sensor heater runs on 12V so that is the voltage you need to supply. Any ESP32 will really do but since you need to run it on 12V you need a DC-DC buck converter to power the ESP32 at 5V.  I instead chose my own RejsaCAN board since it has an on board DC-DC buck converter that can run the board on 4-24V. Pretty neat one board solution with it, I just added a few components to interface with the sensor board.
+
 work in progress....
 
 
