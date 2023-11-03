@@ -31,7 +31,7 @@ Why a capacitive sensor? I've previously used those common resistive sensors tha
 
 ![pcb top](https://github.com/MagnusThome/Capacitive-Rainmeter/assets/32169384/10883a02-48e6-4aa7-8237-53d67ebee8c7)
 
-![pcb bottom](https://github.com/MagnusThome/Capacitive-Rainmeter/assets/32169384/f8bb0217-bba8-4e76-8d42-76a1d8737b4e)
+![pcb bottom](https://github.com/MagnusThome/Capacitive-Rainmeter/assets/32169384/91772012-e3ac-4dbb-a83b-0edec26c4971)
 
 ![arm closed](https://github.com/MagnusThome/Capacitive-Rainmeter/assets/32169384/fd34311f-c391-4b5f-9df3-93f9d417c394)
 
