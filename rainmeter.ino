@@ -6,6 +6,7 @@
 #include <PubSubClient.h>
 #include "config.h"
 
+
 #define GPIO_NTC        1
 #define GPIO_HEATER     48
 #define GPIO_CAPACITOR  2
@@ -206,11 +207,13 @@ void handlewebpage(void){
   snprintf( webpage, WEBPAGESIZE, " \
   <html><head><meta http-equiv=refresh content=15></head><body><pre>\n \
   Wifi signal:    %d dB\n \
-  Hostname:       \"%s\" \n \
-  Mqtt server:    \"%s\" connected: %d \n\n \
+  Mqtt server:    \"%s\" connected: %d \n \
+  Hostname:       \"%s\" \n\n \
+  HA name:        \"%s\" \n \
+  HA uniq_id:     \"%s\" \n\n \
   Rain intensity:  %d \n \
   </pre></body></html> \
-  ", WiFi.RSSI(), hostname, mqttserver, mqttclient.connected(), rainintensity ); 
+  ", WiFi.RSSI(), mqttserver, mqttclient.connected(), hostname, haName, haUniqid, rainintensity ); 
   server.send(200, "text/html", webpage );
 }
 
