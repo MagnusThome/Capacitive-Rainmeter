@@ -6,12 +6,6 @@
 #include <PubSubClient.h>
 #include "config.h"
 
-
-//#define GPIO_NTC        2
-//#define GPIO_HEATER     21
-//#define GPIO_CAPACITOR  1
-//#define GPIO_1MOHM      47
-
 #define GPIO_NTC        1
 #define GPIO_HEATER     48
 #define GPIO_CAPACITOR  2
@@ -33,6 +27,7 @@ char webpage[WEBPAGESIZE];
 
 #define MQTTBUFFSIZE  200
 char mqttbuff[MQTTBUFFSIZE];
+
 
 int rainintensity = 0;
 
@@ -59,7 +54,7 @@ void setup() {
   Serial.print("Connecting to wifi ");
   Serial.print(String(ssid));
   WiFi.setHostname(hostname);
-  WiFi.begin(ssid, password);
+  WiFi.begin(ssid, wifipassword);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
@@ -165,7 +160,7 @@ void mqttConnect(void) {
     if (mqttclient.connect(hostname, mqtt_username, mqtt_password)) {
       digitalWrite(BLUE_LED, HIGH);
       Serial.println(" done!");
-      snprintf( mqttbuff, MQTTBUFFSIZE, "{\"~\":\"homeassistant/sensor/rainmeter\",\"name\":\"Rainmeter\",\"unique_id\":\"rainmeter01\",\"device_class\":\"precipitation_intensity\",\"stat_t\":\"~/state\"}"); 
+      snprintf( mqttbuff, MQTTBUFFSIZE, "{\"~\":\"homeassistant/sensor/%s\",\"name\":\"%s\",\"unique_id\":\"%s\",\"device_class\":\"precipitation_intensity\",\"stat_t\":\"~/state\"}", haTopic, haName, haUniqid); 
       mqttclient.publish("homeassistant/sensor/rainmeter/config", mqttbuff);
       Serial.println(mqttbuff);
     } 
