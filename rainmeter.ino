@@ -151,7 +151,7 @@ bool mqttConnect(void) {
   } 
   digitalWrite(BLUE_LED, LOW);
   Serial.print(" failed, rc=");
-  Serial.print(mqttclient.state());
+  Serial.println(mqttclient.state());
   return false;
 }
 
@@ -203,6 +203,7 @@ void handlewebpage(void){
   Hostname:      %s    \n \
                        \n \
   Mqtt server:   %s connected: %d \n \
+  HA topic:      %s    \n \
   HA name:       %s    \n \
   HA uniq_id:    %s    \n \
                        \n \
@@ -210,7 +211,7 @@ void handlewebpage(void){
   Current:       %.1f  \n \
   Averaged:      %d    \n \
   </pre></body></html> \
-  ", WiFi.RSSI(), hostname, mqttserver, mqttclient.connected(), haName, haUniqid, rawresult, result, rainintensity ); 
+  ", WiFi.RSSI(), hostname, mqttserver, mqttclient.connected(), haTopic, haName, haUniqid, rawresult, result, rainintensity ); 
   server.send(200, "text/html", webpage );
 }
 
