@@ -11,7 +11,7 @@
 #define HEAT_HYSTERESIS    25
 
 #define ANALOG_FULL_RANGE  4096
-#define ROLLING_AVG        15
+#define ROLLING_AVG        6
 
 #define WEBPAGESIZE 512
 char webpage[WEBPAGESIZE];
@@ -20,8 +20,8 @@ char webpage[WEBPAGESIZE];
 char mqttbuff[MQTTBUFFSIZE];
 
 int rawresult;
-int result = 0;
-int rainintensity = 0;
+float result;
+int rainintensity;
 
 
 WiFiClient client;
@@ -82,7 +82,7 @@ void loop() {
   }
 
   static unsigned long timertwo;
-  if (now - timertwo >= 1000) {     // every 1s
+  if (now - timertwo >= 5000) {     // every 5s
     timertwo = now;
     measurerain();
   }
@@ -101,6 +101,7 @@ void loop() {
 void measurerain (void) {
 
   unsigned long timerstart;
+  static float averaged = 0;
   
   heater_off(); // prevent overheating if stuck in while loop below
 
@@ -113,10 +114,11 @@ void measurerain (void) {
   timerstart = micros();
   while (analogRead(GPIO_CAPACITOR) < 0.63*ANALOG_FULL_RANGE);
   rawresult = (int) (micros()-timerstart);
-  if (rawresult>=0 || rawresult<500000) {                  // sanitize from odd readings
-    result = (int)sqrt(rawresult - CAPACITANCE_OFFSET);    // make the data less unlinear and remove null offset
-  }
-  rainintensity = (((ROLLING_AVG-1)*rainintensity) + result );  // rolling average
+  
+  result = (float) constrain(rawresult, 0, 10000);                // sanitize from odd readings
+  result = sqrt(result) - CAPACITANCE_OFFSET;                     // make the data less unlinear and remove null offset
+  averaged = (((ROLLING_AVG-1)*averaged) + result )/ROLLING_AVG;  // smooth out noise
+  rainintensity = (int) constrain(averaged, 0, 1000);             // floor at zero
 
   // -- start discharging capacitor --  
   pinMode(GPIO_CAPACITOR, OUTPUT);
@@ -127,18 +129,6 @@ void measurerain (void) {
   Serial.print(result);
   Serial.print("\t");
   Serial.println(rainintensity);
-}
-
-
-
-// -------------------------------------------------------------------
-void mqttsend (void) {
-
-  if (!mqttclient.connected()) {
-    mqttConnect();
-  }
-  snprintf( mqttbuff, MQTTBUFFSIZE, "%d", rainintensity );
-  mqttclient.publish("homeassistant/sensor/rainmeter/state", mqttbuff);
 }
 
 
@@ -171,6 +161,18 @@ void mqttConnect(void) {
 
 
 // -------------------------------------------------------------------
+void mqttsend (void) {
+
+  if (!mqttclient.connected()) {
+    mqttConnect();
+  }
+  snprintf( mqttbuff, MQTTBUFFSIZE, "%d", rainintensity );
+  mqttclient.publish("homeassistant/sensor/rainmeter/state", mqttbuff);
+}
+
+
+
+// -------------------------------------------------------------------
 void heatercontrol(void) {    
   int temperature = ANALOG_FULL_RANGE-analogRead(GPIO_NTC);
   if (temperature < HEAT_LEVEL) {
@@ -198,17 +200,17 @@ void heater_off(void) {
 void handlewebpage(void){
 
   snprintf( webpage, WEBPAGESIZE, " \
-  <html><head><meta http-equiv=refresh content=1></head><body><pre>\n \
-  Wifi signal:    %d dB\n \
-  Hostname:       \"%s\" \n \
-                         \n \
-  Mqtt server:    \"%s\" connected: %d \n \
-  HA name:        \"%s\" \n \
-  HA uniq_id:     \"%s\" \n \
-                         \n \
-  Raw result:      %d    \n \
-  Result:          %d    \n \
-  Averaged:        %d    \n \
+  <html><head><meta http-equiv=refresh content=5></head><body><pre>\n \
+  Wifi signal:   %d dB \n \
+  Hostname:      %s    \n \
+                       \n \
+  Mqtt server:   %s connected: %d \n \
+  HA name:       %s    \n \
+  HA uniq_id:    %s    \n \
+                       \n \
+  Raw result:    %d    \n \
+  Current:       %.1f  \n \
+  Averaged:      %d    \n \
   </pre></body></html> \
   ", WiFi.RSSI(), hostname, mqttserver, mqttclient.connected(), haName, haUniqid, rawresult, result, rainintensity ); 
   server.send(200, "text/html", webpage );
