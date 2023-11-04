@@ -7,28 +7,17 @@
 #include "config.h"
 
 
-#define GPIO_NTC        1
-#define GPIO_HEATER     48
-#define GPIO_CAPACITOR  2
-#define GPIO_1MOHM      41
-
-#define BLUE_LED        10
-#define YELLOW_LED      11
-
-#define ANALOG_FULL_RANGE   4096
-#define CAPACITANCE_OFFSET  0
-#define ROLLING_AVG 15
-
 #define HEAT_LEVEL  2500
 #define HEAT_HYSTERESIS 25
 
+#define ANALOG_FULL_RANGE   4096
+#define ROLLING_AVG 15
 
 #define WEBPAGESIZE 360
 char webpage[WEBPAGESIZE];
 
 #define MQTTBUFFSIZE  200
 char mqttbuff[MQTTBUFFSIZE];
-
 
 int rainintensity;
 int rawresult;
