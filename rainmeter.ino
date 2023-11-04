@@ -13,14 +13,15 @@
 #define ANALOG_FULL_RANGE   4096
 #define ROLLING_AVG 15
 
-#define WEBPAGESIZE 360
+#define WEBPAGESIZE 512
 char webpage[WEBPAGESIZE];
 
-#define MQTTBUFFSIZE  200
+#define MQTTBUFFSIZE  256
 char mqttbuff[MQTTBUFFSIZE];
 
 int rainintensity;
 int rawresult;
+int result;
 
 
 WiFiClient client;
@@ -100,7 +101,6 @@ void loop() {
 void measurerain (void) {
 
   unsigned long timerstart;
-  int result;
   static int averaged = 0;
   
   heater_off(); // prevent overheating if stuck in while loop below
@@ -118,6 +118,7 @@ void measurerain (void) {
   result = rawresult-CAPACITANCE_OFFSET;
   if (result<0) { result = 0; }
   if (result>500000) { result = 0; }
+  
   averaged = (((ROLLING_AVG-1)*averaged) + result ) / ROLLING_AVG;
   rainintensity = (int)sqrt(averaged); // making the data less unlinear
 
@@ -203,14 +204,18 @@ void handlewebpage(void){
   snprintf( webpage, WEBPAGESIZE, " \
   <html><head><meta http-equiv=refresh content=1></head><body><pre>\n \
   Wifi signal:    %d dB\n \
-  Hostname:       \"%s\" \n\n \
+  Hostname:       \"%s\" \n \
+                         \n \
   Mqtt server:    \"%s\" connected: %d \n \
   HA name:        \"%s\" \n \
-  HA uniq_id:     \"%s\" \n\n \
-  Raw result:      %d (sqrt %d)\n \
-  Rain intensity:  %d \n \
+  HA uniq_id:     \"%s\" \n \
+                         \n \
+  Raw:             %d    \n \
+  Fixed Offset:    %d    \n \
+  More Linear:     %d    \n \
+  Averaged:        %d    \n \
   </pre></body></html> \
-  ", WiFi.RSSI(), hostname, mqttserver, mqttclient.connected(), haName, haUniqid, rawresult, (int)sqrt(rawresult), rainintensity ); 
+  ", WiFi.RSSI(), hostname, mqttserver, mqttclient.connected(), haName, haUniqid, rawresult, rawresult-CAPACITANCE_OFFSET, (int)sqrt(rawresult-CAPACITANCE_OFFSET), rainintensity ); 
   server.send(200, "text/html", webpage );
 }
 
