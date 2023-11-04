@@ -21,7 +21,7 @@ char mqttbuff[MQTTBUFFSIZE];
 
 int rainintensity;
 int rawresult;
-int result;
+int result = 0;
 
 
 WiFiClient client;
@@ -114,13 +114,10 @@ void measurerain (void) {
   timerstart = micros();
   while (analogRead(GPIO_CAPACITOR) < 0.63*ANALOG_FULL_RANGE);
   rawresult = (int) (micros()-timerstart);
-  
-  result = rawresult-CAPACITANCE_OFFSET;
-  if (result<0) { result = 0; }
-  if (result>500000) { result = 0; }
-  
-  averaged = (((ROLLING_AVG-1)*averaged) + result ) / ROLLING_AVG;
-  rainintensity = (int)sqrt(averaged); // making the data less unlinear
+  if (rawresult>=0 || rawresult<500000) {                  // sanitize from odd readings
+    result = (int)sqrt(rawresult - CAPACITANCE_OFFSET);    // make the data less unlinear and remove null offset
+  }
+  rainintensity = (((ROLLING_AVG-1)*averaged) + result );  // rolling average
 
   // -- start discharging capacitor --  
   pinMode(GPIO_CAPACITOR, OUTPUT);
@@ -210,12 +207,11 @@ void handlewebpage(void){
   HA name:        \"%s\" \n \
   HA uniq_id:     \"%s\" \n \
                          \n \
-  Raw:             %d    \n \
-  Fixed Offset:    %d    \n \
-  More Linear:     %d    \n \
+  Raw result:      %d    \n \
+  Result:          %d    \n \
   Averaged:        %d    \n \
   </pre></body></html> \
-  ", WiFi.RSSI(), hostname, mqttserver, mqttclient.connected(), haName, haUniqid, rawresult, rawresult-CAPACITANCE_OFFSET, (int)sqrt(rawresult-CAPACITANCE_OFFSET), rainintensity ); 
+  ", WiFi.RSSI(), hostname, mqttserver, mqttclient.connected(), haName, haUniqid, rawresult, result, rainintensity ); 
   server.send(200, "text/html", webpage );
 }
 
