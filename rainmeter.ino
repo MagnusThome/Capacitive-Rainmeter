@@ -128,6 +128,8 @@ void measurerain (void) {
   Serial.print("\t");
   Serial.print(result);
   Serial.print("\t");
+  Serial.print(averaged);
+  Serial.print("\t");
   Serial.println(rainintensity);
 }
 
@@ -144,7 +146,7 @@ bool mqttConnect(void) {
   if (mqttclient.connect(hostname, mqtt_username, mqtt_password)) {
     digitalWrite(BLUE_LED, HIGH);
     Serial.println(" done!");
-    snprintf( mqttbuff, MQTTBUFFSIZE, "{\"~\":\"homeassistant/sensor/%s\",\"name\":\"%s\",\"unique_id\":\"%s\",\"device_class\":\"precipitation_intensity\",\"stat_t\":\"~/state\"}", haTopic, haName, haUniqid); 
+    snprintf( mqttbuff, MQTTBUFFSIZE, "{\"~\":\"homeassistant/sensor/rainmeter\",\"name\":\"%s\",\"unique_id\":\"%s\",\"device_class\":\"precipitation_intensity\",\"stat_t\":\"~/state\"}", haName, haUniqid); 
     mqttclient.publish("homeassistant/sensor/rainmeter/config", mqttbuff);
     Serial.println(mqttbuff);
     return true;
@@ -161,11 +163,10 @@ bool mqttConnect(void) {
 void mqttsend (void) {
 
   if (!mqttclient.connected()) {
-    if (mqttConnect()) {
-      snprintf( mqttbuff, MQTTBUFFSIZE, "%d", rainintensity );
-      mqttclient.publish("homeassistant/sensor/rainmeter/state", mqttbuff);
-    }
+    mqttConnect();
   }
+  snprintf( mqttbuff, MQTTBUFFSIZE, "%d", rainintensity );
+  mqttclient.publish("homeassistant/sensor/rainmeter/state", mqttbuff);
 }
 
 
@@ -203,7 +204,6 @@ void handlewebpage(void){
   Hostname:      %s    \n \
                        \n \
   Mqtt server:   %s connected: %d \n \
-  HA topic:      %s    \n \
   HA name:       %s    \n \
   HA uniq_id:    %s    \n \
                        \n \
@@ -211,7 +211,7 @@ void handlewebpage(void){
   Current:       %.1f  \n \
   Averaged:      %d    \n \
   </pre></body></html> \
-  ", WiFi.RSSI(), hostname, mqttserver, mqttclient.connected(), haTopic, haName, haUniqid, rawresult, result, rainintensity ); 
+  ", WiFi.RSSI(), hostname, mqttserver, mqttclient.connected(), haName, haUniqid, rawresult, result, rainintensity ); 
   server.send(200, "text/html", webpage );
 }
 
