@@ -30,8 +30,8 @@ char webpage[WEBPAGESIZE];
 char mqttbuff[MQTTBUFFSIZE];
 
 
-int rainintensity = 0;
-
+int rainintensity;
+int rawresult;
 
 
 WiFiClient client;
@@ -111,6 +111,8 @@ void loop() {
 void measurerain (void) {
 
   unsigned long timerstart;
+  int result;
+  static int averaged = 0;
   
   heater_off(); // prevent overheating if stuck in while loop below
 
@@ -122,15 +124,20 @@ void measurerain (void) {
   digitalWrite(GPIO_1MOHM, HIGH);
   timerstart = micros();
   while (analogRead(GPIO_CAPACITOR) < 0.63*ANALOG_FULL_RANGE);
-  int result = micros()-timerstart-CAPACITANCE_OFFSET;
+  rawresult = (int) (micros()-timerstart);
+  
+  result = rawresult-CAPACITANCE_OFFSET;
   if (result<0) { result = 0; }
   if (result>500000) { result = 0; }
-  rainintensity = (((ROLLING_AVG-1)*rainintensity) + result ) / ROLLING_AVG;
+  averaged = (((ROLLING_AVG-1)*averaged) + result ) / ROLLING_AVG;
+  rainintensity = (int)sqrt(averaged); // making the data less unlinear
 
   // -- start discharging capacitor --  
   pinMode(GPIO_CAPACITOR, OUTPUT);
   digitalWrite(GPIO_CAPACITOR, LOW);
 
+  Serial.print(rawresult);
+  Serial.print("\t");
   Serial.print(result);
   Serial.print("\t");
   Serial.println(rainintensity);
@@ -205,15 +212,16 @@ void heater_off(void) {
 void handlewebpage(void){
 
   snprintf( webpage, WEBPAGESIZE, " \
-  <html><head><meta http-equiv=refresh content=15></head><body><pre>\n \
+  <html><head><meta http-equiv=refresh content=1></head><body><pre>\n \
   Wifi signal:    %d dB\n \
-  Mqtt server:    \"%s\" connected: %d \n \
   Hostname:       \"%s\" \n\n \
+  Mqtt server:    \"%s\" connected: %d \n \
   HA name:        \"%s\" \n \
   HA uniq_id:     \"%s\" \n\n \
+  Raw result:      %d (sqrt %d)\n \
   Rain intensity:  %d \n \
   </pre></body></html> \
-  ", WiFi.RSSI(), mqttserver, mqttclient.connected(), hostname, haName, haUniqid, rainintensity ); 
+  ", WiFi.RSSI(), hostname, mqttserver, mqttclient.connected(), haName, haUniqid, rawresult, (int)sqrt(rawresult), rainintensity ); 
   server.send(200, "text/html", webpage );
 }
 
