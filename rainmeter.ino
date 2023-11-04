@@ -134,28 +134,25 @@ void measurerain (void) {
 
 
 // -------------------------------------------------------------------
-void mqttConnect(void) {
+bool mqttConnect(void) {
   
-  heater_off(); // prevent overheating if stuck in while loop below
-
-  while (!mqttclient.connected()) {
-    Serial.print("Connecting to mqtt server ");
-    Serial.print(String(mqttserver));
-    if (mqttclient.connect(hostname, mqtt_username, mqtt_password)) {
-      digitalWrite(BLUE_LED, HIGH);
-      Serial.println(" done!");
-      snprintf( mqttbuff, MQTTBUFFSIZE, "{\"~\":\"homeassistant/sensor/%s\",\"name\":\"%s\",\"unique_id\":\"%s\",\"device_class\":\"precipitation_intensity\",\"stat_t\":\"~/state\"}", haTopic, haName, haUniqid); 
-      mqttclient.publish("homeassistant/sensor/rainmeter/config", mqttbuff);
-      Serial.println(mqttbuff);
-    } 
-    else {
-      digitalWrite(BLUE_LED, LOW);
-      Serial.print(" failed, rc=");
-      Serial.print(mqttclient.state());
-      Serial.println(".");
-      delay(5000);
-    }
+  if (mqttclient.connected()) {
+    return true;
   }
+  Serial.print("Connecting to mqtt server ");
+  Serial.print(String(mqttserver));
+  if (mqttclient.connect(hostname, mqtt_username, mqtt_password)) {
+    digitalWrite(BLUE_LED, HIGH);
+    Serial.println(" done!");
+    snprintf( mqttbuff, MQTTBUFFSIZE, "{\"~\":\"homeassistant/sensor/%s\",\"name\":\"%s\",\"unique_id\":\"%s\",\"device_class\":\"precipitation_intensity\",\"stat_t\":\"~/state\"}", haTopic, haName, haUniqid); 
+    mqttclient.publish("homeassistant/sensor/rainmeter/config", mqttbuff);
+    Serial.println(mqttbuff);
+    return true;
+  } 
+  digitalWrite(BLUE_LED, LOW);
+  Serial.print(" failed, rc=");
+  Serial.print(mqttclient.state());
+  return false;
 }
 
 
@@ -164,10 +161,11 @@ void mqttConnect(void) {
 void mqttsend (void) {
 
   if (!mqttclient.connected()) {
-    mqttConnect();
+    if (mqttConnect()) {
+      snprintf( mqttbuff, MQTTBUFFSIZE, "%d", rainintensity );
+      mqttclient.publish("homeassistant/sensor/rainmeter/state", mqttbuff);
+    }
   }
-  snprintf( mqttbuff, MQTTBUFFSIZE, "%d", rainintensity );
-  mqttclient.publish("homeassistant/sensor/rainmeter/state", mqttbuff);
 }
 
 
