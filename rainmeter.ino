@@ -7,21 +7,21 @@
 #include "config.h"
 
 
-#define HEAT_LEVEL  2500
-#define HEAT_HYSTERESIS 25
+#define HEAT_LEVEL         2500
+#define HEAT_HYSTERESIS    25
 
-#define ANALOG_FULL_RANGE   4096
-#define ROLLING_AVG 15
+#define ANALOG_FULL_RANGE  4096
+#define ROLLING_AVG        15
 
 #define WEBPAGESIZE 512
 char webpage[WEBPAGESIZE];
 
-#define MQTTBUFFSIZE  256
+#define MQTTBUFFSIZE 256
 char mqttbuff[MQTTBUFFSIZE];
 
-int rainintensity;
 int rawresult;
 int result = 0;
+int rainintensity = 0;
 
 
 WiFiClient client;
@@ -101,7 +101,6 @@ void loop() {
 void measurerain (void) {
 
   unsigned long timerstart;
-  static int averaged = 0;
   
   heater_off(); // prevent overheating if stuck in while loop below
 
@@ -117,7 +116,7 @@ void measurerain (void) {
   if (rawresult>=0 || rawresult<500000) {                  // sanitize from odd readings
     result = (int)sqrt(rawresult - CAPACITANCE_OFFSET);    // make the data less unlinear and remove null offset
   }
-  rainintensity = (((ROLLING_AVG-1)*averaged) + result );  // rolling average
+  rainintensity = (((ROLLING_AVG-1)*rainintensity) + result );  // rolling average
 
   // -- start discharging capacitor --  
   pinMode(GPIO_CAPACITOR, OUTPUT);
