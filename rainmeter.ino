@@ -200,12 +200,12 @@ void handlewebpage(void){
 
   snprintf( webpage, WEBPAGESIZE, " \
   <html><head><meta http-equiv=refresh content=5></head><body><pre>\n \
-  Wifi signal:      %4d dB  \n \
-  Hostname:            %s    \n \
+  Wifi signal:      %5d dB  \n \
+  Hostname:           %s    \n \
                            \n \
-  Mqtt server:         %s connected: %d \n \
-  HA name:             %s    \n \
-  HA uniq_id:          %s    \n \
+  Mqtt server:        %s  connected: %d \n \
+  HA name:            %s    \n \
+  HA uniq_id:         %s    \n \
                            \n \
   Raw result:       %5d     \n \
   Result:           %5.1f   \n \
