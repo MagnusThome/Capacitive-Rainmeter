@@ -21,6 +21,7 @@ char mqttbuff[MQTTBUFFSIZE];
 
 int rawresult;
 float result;
+float averaged = 0;
 int rainintensity;
 
 
@@ -101,7 +102,6 @@ void loop() {
 void measurerain (void) {
 
   unsigned long timerstart;
-  static float averaged = 0;
   
   heater_off(); // prevent overheating if stuck in while loop below
 
@@ -200,18 +200,19 @@ void handlewebpage(void){
 
   snprintf( webpage, WEBPAGESIZE, " \
   <html><head><meta http-equiv=refresh content=5></head><body><pre>\n \
-  Wifi signal:   %d dB \n \
-  Hostname:      %s    \n \
-                       \n \
-  Mqtt server:   %s connected: %d \n \
-  HA name:       %s    \n \
-  HA uniq_id:    %s    \n \
-                       \n \
-  Raw result:    %d    \n \
-  Current:       %.1f  \n \
-  Averaged:      %d    \n \
+  Wifi signal:      %4d dB  \n \
+  Hostname:            %s    \n \
+                           \n \
+  Mqtt server:         %s connected: %d \n \
+  HA name:             %s    \n \
+  HA uniq_id:          %s    \n \
+                           \n \
+  Raw result:       %5d     \n \
+  Result:           %5.1f   \n \
+  Averaged:         %5.1f   \n \
+  Rainintensity:    %5d     \n \
   </pre></body></html> \
-  ", WiFi.RSSI(), hostname, mqttserver, mqttclient.connected(), haName, haUniqid, rawresult, result, rainintensity ); 
+  ", WiFi.RSSI(), hostname, mqttserver, mqttclient.connected(), haName, haUniqid, rawresult, result, averaged, rainintensity ); 
   server.send(200, "text/html", webpage );
 }
 
