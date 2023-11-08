@@ -11,7 +11,7 @@
 #define HEAT_HYSTERESIS    25
 
 #define ANALOG_FULL_RANGE  4096
-#define ROLLING_AVG        6
+#define ROLLING_AVG        8
 
 #define WEBPAGESIZE 512
 char webpage[WEBPAGESIZE];
@@ -115,10 +115,10 @@ void measurerain (void) {
   while (analogRead(GPIO_CAPACITOR) < 0.63*ANALOG_FULL_RANGE);
   rawresult = (int) (micros()-timerstart);
   
-  result = (float) constrain(rawresult, 0, 10000);                // sanitize from odd readings
-  result = sqrt(result) - CAPACITANCE_OFFSET;                     // make the data less unlinear and remove null offset
+  rawresult = (float) constrain(rawresult, 0, 10000);             // sanitize from odd readings
+  result = (cbrt(rawresult)*10) - CAPACITANCE_OFFSET;             // make the data less unlinear and remove null offset
   averaged = (((ROLLING_AVG-1)*averaged) + result )/ROLLING_AVG;  // smooth out noise
-  rainintensity = (int) constrain(averaged, 0, 1000);             // floor at zero
+  rainintensity = (int) round(constrain(averaged, 0, 1000));      // floor at zero
 
   // -- start discharging capacitor --  
   pinMode(GPIO_CAPACITOR, OUTPUT);
