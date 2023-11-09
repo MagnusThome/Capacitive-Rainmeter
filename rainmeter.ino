@@ -112,10 +112,13 @@ void measurerain (void) {
   digitalWrite(GPIO_1MOHM, HIGH);
   timerstart = micros();
   while (analogRead(GPIO_CAPACITOR) < 0.63*ANALOG_FULL_RANGE);
-  rawresult = (int) (micros()-timerstart) - CAPACITANCE_OFFSET;
-  rawresult = (float) constrain(rawresult, -1000, 10000);             // sanitize from odd readings
+  rawresult = (int) (micros()-timerstart);
+
+  // Repackage result
+  rawresult -= CAPACITANCE_OFFSET;                                    // remove offset
+  rawresult = constrain(rawresult, -1000, 10000);                     // sanitize from odd readings
   averaged = (((ROLLING_AVG-1)*averaged) + rawresult )/ROLLING_AVG;   // smooth out noise
-  rainintensity = (int) round(sqrt(constrain(averaged, 0, 1000)));    // make the data less unlinear      
+  rainintensity = (int) sqrt(max((int)averaged, 0));                  // set floor to zero and then make the data less unlinear      
 
   // -- start discharging capacitor --  
   pinMode(GPIO_CAPACITOR, OUTPUT);
