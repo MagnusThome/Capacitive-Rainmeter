@@ -4,6 +4,7 @@
 #include <WebServer.h>
 #include <HTTPUpdateServer.h>
 #include <PubSubClient.h>
+#include <RunningMedian.h>
 #include "config.h"
 
 
@@ -11,7 +12,7 @@
 #define HEAT_HYSTERESIS    25
 
 #define ANALOG_FULL_RANGE  4096
-#define ROLLING_AVG        25
+#define ROLLING_MEDIAN     30
 
 #define WEBPAGESIZE 512
 char webpage[WEBPAGESIZE];
@@ -20,7 +21,6 @@ char webpage[WEBPAGESIZE];
 char mqttbuff[MQTTBUFFSIZE];
 
 int rawresult;
-float averaged = 0;
 int rainintensity;
 
 
@@ -28,7 +28,7 @@ WiFiClient client;
 WebServer server(80);
 HTTPUpdateServer httpUpdater;
 PubSubClient mqttclient(client);
-
+RunningMedian measurements = RunningMedian(ROLLING_MEDIAN);
 
 
 // -------------------------------------------------------------------
@@ -102,7 +102,7 @@ void measurerain (void) {
 
   unsigned long timerstart;
   
-  heater_off(); // prevent overheating if stuck in while loop below
+  heater_off(); // prevent overheating if stuck in the while loop below
 
   // -- stop discharging the now discharged capacitor by making gpio high impedance --
   pinMode(GPIO_CAPACITOR, INPUT); 
@@ -115,20 +115,13 @@ void measurerain (void) {
   rawresult = (int) (micros()-timerstart);
 
   // Repackage result
-  rawresult -= CAPACITANCE_OFFSET;                                    // remove offset
-  rawresult = constrain(rawresult, -1000, 10000);                     // sanitize from odd readings
-  averaged = (((ROLLING_AVG-1)*averaged) + rawresult )/ROLLING_AVG;   // smooth out noise
-  rainintensity = (int) sqrt(max((int)averaged, 0));                  // set floor to zero and then make the data less unlinear      
+  rawresult -= CAPACITANCE_OFFSET;                  // remove offset
+  measurements.add(rawresult);                      // add to rolling avg/median array
+  Serial.println(rawresult);
 
-  // -- start discharging capacitor --  
+  // -- start discharging capacitor preparing it for next measurement --  
   pinMode(GPIO_CAPACITOR, OUTPUT);
   digitalWrite(GPIO_CAPACITOR, LOW);
-
-  Serial.print(rawresult);
-  Serial.print("\t");
-  Serial.print(averaged);
-  Serial.print("\t");
-  Serial.println(rainintensity);
 }
 
 
@@ -163,6 +156,9 @@ void mqttsend (void) {
   if (!mqttclient.connected()) {
     mqttConnect();
   }
+
+  rainintensity = (int) (10 * sqrt(max(measurements.getMedian(), (float)0.0)));     // set floor to zero and make range feel more linear      
+  
   snprintf( mqttbuff, MQTTBUFFSIZE, "%d", rainintensity );
   mqttclient.publish("homeassistant/sensor/rainmeter/state", mqttbuff);
 }
@@ -201,15 +197,17 @@ void handlewebpage(void){
   Wifi signal:      %5d dB \n \
   Hostname:           %s   \n \
                            \n \
-  Mqtt server:        %s  connected: %d \n \
+  Mqtt server:        %s   \n \
+  Connected:          %d   \n \
   HA name:            %s   \n \
   HA uniq_id:         %s   \n \
                            \n \
   Raw result:       %5d    \n \
-  Averaged:         %5.1f  \n \
+  Median:           %5d    \n \
+                           \n \
   Rainintensity:    %5d    \n \
   </pre></body></html> \
-  ", WiFi.RSSI(), hostname, mqttserver, mqttclient.connected(), haName, haUniqid, rawresult, averaged, rainintensity ); 
+  ", WiFi.RSSI(), hostname, mqttserver, mqttclient.connected(), haName, haUniqid, rawresult, (int)measurements.getMedian(), rainintensity ); 
   server.send(200, "text/html", webpage );
 }
 
