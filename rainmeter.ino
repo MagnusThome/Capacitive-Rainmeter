@@ -12,8 +12,7 @@
 #define HEAT_HYSTERESIS    25
 
 #define ANALOG_FULL_RANGE  4096
-#define ROLLING_MEDIAN     30
-
+#define ROLLING_MEDIAN     60
 #define WEBPAGESIZE 512
 char webpage[WEBPAGESIZE];
 
@@ -82,7 +81,7 @@ void loop() {
   }
 
   static unsigned long timertwo;
-  if (now - timertwo >= 2000) {     // every 2s
+  if (now - timertwo >= 1000) {     // every 1s
     timertwo = now;
     measurerain();
   }
@@ -193,7 +192,7 @@ void heater_off(void) {
 void handlewebpage(void){
 
   snprintf( webpage, WEBPAGESIZE, " \
-  <html><head><meta http-equiv=refresh content=2></head><body><pre>\n \
+  <html><head><meta http-equiv=refresh content=1></head><body><pre>\n \
   Wifi signal:      %5d dB \n \
   Hostname:           %s   \n \
                            \n \
