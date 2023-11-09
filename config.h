@@ -13,7 +13,7 @@ const char* ota_password = "xxxxxx";
 const char* haName   = "Rainmeter";
 const char* haUniqid = "rainmeter01";
 
-#define CAPACITANCE_OFFSET  10.0     // Set so that your meter reports close to zero when fully dry
+#define CAPACITANCE_OFFSET  300     // Set so that your meter reports close to zero when fully dry
 
 #define BLUE_LED        10
 #define YELLOW_LED      11
