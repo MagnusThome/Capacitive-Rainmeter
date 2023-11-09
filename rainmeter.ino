@@ -11,7 +11,7 @@
 #define HEAT_HYSTERESIS    25
 
 #define ANALOG_FULL_RANGE  4096
-#define ROLLING_AVG        8
+#define ROLLING_AVG        25
 
 #define WEBPAGESIZE 512
 char webpage[WEBPAGESIZE];
@@ -20,7 +20,6 @@ char webpage[WEBPAGESIZE];
 char mqttbuff[MQTTBUFFSIZE];
 
 int rawresult;
-float result;
 float averaged = 0;
 int rainintensity;
 
@@ -83,7 +82,7 @@ void loop() {
   }
 
   static unsigned long timertwo;
-  if (now - timertwo >= 5000) {     // every 5s
+  if (now - timertwo >= 2000) {     // every 2s
     timertwo = now;
     measurerain();
   }
@@ -113,20 +112,16 @@ void measurerain (void) {
   digitalWrite(GPIO_1MOHM, HIGH);
   timerstart = micros();
   while (analogRead(GPIO_CAPACITOR) < 0.63*ANALOG_FULL_RANGE);
-  rawresult = (int) (micros()-timerstart);
-  
-  rawresult = (float) constrain(rawresult, 0, 10000);             // sanitize from odd readings
-  result = (cbrt(rawresult)*10) - CAPACITANCE_OFFSET;             // make the data less unlinear and remove null offset
-  averaged = (((ROLLING_AVG-1)*averaged) + result )/ROLLING_AVG;  // smooth out noise
-  rainintensity = (int) round(constrain(averaged, 0, 1000));      // floor at zero
+  rawresult = (int) (micros()-timerstart) - CAPACITANCE_OFFSET;
+  rawresult = (float) constrain(rawresult, -1000, 10000);             // sanitize from odd readings
+  averaged = (((ROLLING_AVG-1)*averaged) + rawresult )/ROLLING_AVG;   // smooth out noise
+  rainintensity = (int) round(sqrt(constrain(averaged, 0, 1000)));    // make the data less unlinear      
 
   // -- start discharging capacitor --  
   pinMode(GPIO_CAPACITOR, OUTPUT);
   digitalWrite(GPIO_CAPACITOR, LOW);
 
   Serial.print(rawresult);
-  Serial.print("\t");
-  Serial.print(result);
   Serial.print("\t");
   Serial.print(averaged);
   Serial.print("\t");
@@ -199,20 +194,19 @@ void heater_off(void) {
 void handlewebpage(void){
 
   snprintf( webpage, WEBPAGESIZE, " \
-  <html><head><meta http-equiv=refresh content=5></head><body><pre>\n \
-  Wifi signal:      %5d dB  \n \
-  Hostname:           %s    \n \
+  <html><head><meta http-equiv=refresh content=2></head><body><pre>\n \
+  Wifi signal:      %5d dB \n \
+  Hostname:           %s   \n \
                            \n \
   Mqtt server:        %s  connected: %d \n \
-  HA name:            %s    \n \
-  HA uniq_id:         %s    \n \
+  HA name:            %s   \n \
+  HA uniq_id:         %s   \n \
                            \n \
-  Raw result:       %5d     \n \
-  Result:           %5.1f   \n \
-  Averaged:         %5.1f   \n \
-  Rainintensity:    %5d     \n \
+  Raw result:       %5d    \n \
+  Averaged:         %5.1f  \n \
+  Rainintensity:    %5d    \n \
   </pre></body></html> \
-  ", WiFi.RSSI(), hostname, mqttserver, mqttclient.connected(), haName, haUniqid, rawresult, result, averaged, rainintensity ); 
+  ", WiFi.RSSI(), hostname, mqttserver, mqttclient.connected(), haName, haUniqid, rawresult, averaged, rainintensity ); 
   server.send(200, "text/html", webpage );
 }
 
