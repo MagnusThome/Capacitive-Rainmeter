@@ -8,15 +8,14 @@
 #include "config.h"
 
 
-#define HEAT_LEVEL         2500
-#define HEAT_HYSTERESIS    25
+#define HEAT_LEVEL          2500
+#define HEAT_HYSTERESIS     25
 
-#define ANALOG_FULL_RANGE  4096
-#define ROLLING_MEDIAN     60
-#define WEBPAGESIZE 512
+#define ANALOG_FULL_RANGE   4096
+#define WEBPAGESIZE         1024
 char webpage[WEBPAGESIZE];
 
-#define MQTTBUFFSIZE 256
+#define MQTTBUFFSIZE        256
 char mqttbuff[MQTTBUFFSIZE];
 
 int rawresult;
@@ -27,7 +26,9 @@ WiFiClient client;
 WebServer server(80);
 HTTPUpdateServer httpUpdater;
 PubSubClient mqttclient(client);
-RunningMedian measurements = RunningMedian(ROLLING_MEDIAN);
+
+#define RUNNING_MEDIANS 20
+RunningMedian measurements = RunningMedian(RUNNING_MEDIANS);   
 
 
 // -------------------------------------------------------------------
@@ -35,11 +36,13 @@ void setup() {
   Serial.begin(115200);
   Serial.setTxTimeoutMs(0); // prevent slow serial prints if no usb
   
-  pinMode(GPIO_CAPACITOR, INPUT);
   pinMode(GPIO_1MOHM, INPUT);
   pinMode(GPIO_HEATER, OUTPUT);
   pinMode(BLUE_LED, OUTPUT);
   pinMode(YELLOW_LED, OUTPUT);
+
+  pinMode(GPIO_CAPACITOR, OUTPUT);
+  digitalWrite(GPIO_CAPACITOR, LOW);    // discharge the capacitor preparing it for the first measurement
 
   Serial.print("Connecting to wifi ");
   Serial.print(String(ssid));
@@ -84,14 +87,15 @@ void loop() {
   if (now - timertwo >= 1000) {     // every 1s
     timertwo = now;
     measurerain();
+    debugplotter();
   }
   
   static unsigned long timerthree;
   if (now - timerthree >= 60000) {  // every 60s
     timerthree = now;
-    mqttsend();
+    rainintensity = (int) (10 * sqrt(max(measurements.getMedian(), (float)0.0)));   // make range feel more linear      
+    mqttsend(rainintensity);                                                        // set floor to zero
   }
-  
 }
 
 
@@ -101,7 +105,7 @@ void measurerain (void) {
 
   unsigned long timerstart;
   
-  heater_off(); // prevent overheating if stuck in the while loop below
+  heater_off();  // prevent overheating if stuck in the while loop below
 
   // -- stop discharging the now discharged capacitor by making gpio high impedance --
   pinMode(GPIO_CAPACITOR, INPUT); 
@@ -114,9 +118,8 @@ void measurerain (void) {
   rawresult = (int) (micros()-timerstart);
 
   // Repackage result
-  rawresult -= CAPACITANCE_OFFSET;                  // remove offset
-  measurements.add(rawresult);                      // add to rolling avg/median array
-  Serial.println(rawresult);
+  rawresult -= CAPACITANCE_OFFSET;                      // remove offset
+  measurements.add(constrain(rawresult, -500, 2000));   // sanitize and remove further outliers with median
 
   // -- start discharging capacitor preparing it for next measurement --  
   pinMode(GPIO_CAPACITOR, OUTPUT);
@@ -150,15 +153,12 @@ bool mqttConnect(void) {
 
 
 // -------------------------------------------------------------------
-void mqttsend (void) {
+void mqttsend (int rain) {
 
   if (!mqttclient.connected()) {
     mqttConnect();
   }
-
-  rainintensity = (int) (10 * sqrt(max(measurements.getMedian(), (float)0.0)));     // set floor to zero and make range feel more linear      
-  
-  snprintf( mqttbuff, MQTTBUFFSIZE, "%d", rainintensity );
+  snprintf( mqttbuff, MQTTBUFFSIZE, "%d", rain );
   mqttclient.publish("homeassistant/sensor/rainmeter/state", mqttbuff);
 }
 
@@ -212,6 +212,16 @@ void handlewebpage(void){
 
 
 
+
+// -------------------------------------------------------------------
+void debugplotter(void) {
+  Serial.print(rawresult);
+  Serial.print("\t");
+  Serial.print((int)measurements.getMedian());
+  Serial.print("\t");
+  Serial.print(rainintensity);
+  Serial.println();
+}
 
 
 
