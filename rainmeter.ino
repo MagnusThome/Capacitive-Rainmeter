@@ -12,9 +12,9 @@
 #define HEAT_HYSTERESIS     25
 
 #define ANALOG_FULL_RANGE   4096
+
 #define WEBPAGESIZE         1024
 char webpage[WEBPAGESIZE];
-
 #define MQTTBUFFSIZE        256
 char mqttbuff[MQTTBUFFSIZE];
 
@@ -27,7 +27,8 @@ WebServer server(80);
 HTTPUpdateServer httpUpdater;
 PubSubClient mqttclient(client);
 
-#define RUNNING_MEDIANS 20
+#define RUNNING_MEDIANS     60
+#define COMPOFFSET          50
 RunningMedian measurements = RunningMedian(RUNNING_MEDIANS);   
 
 
@@ -87,14 +88,14 @@ void loop() {
   if (now - timertwo >= 1000) {     // every 1s
     timertwo = now;
     measurerain();
-    debugplotter();
   }
   
   static unsigned long timerthree;
   if (now - timerthree >= 60000) {  // every 60s
     timerthree = now;
-    rainintensity = (int) (10 * sqrt(max(measurements.getMedian(), (float)0.0)));   // make range feel more linear      
-    mqttsend(rainintensity);                                                        // set floor to zero
+    mqttsend(rainintensity); 
+//    mqttsend(max(rainintensity,0));  // set floor to zero
+    Serial.println(rainintensity);
   }
 }
 
@@ -115,11 +116,11 @@ void measurerain (void) {
   digitalWrite(GPIO_1MOHM, HIGH);
   timerstart = micros();
   while (analogRead(GPIO_CAPACITOR) < 0.63*ANALOG_FULL_RANGE);
-  rawresult = (int) (micros()-timerstart);
+  rawresult = (int)(micros()-timerstart);
 
   // Repackage result
-  rawresult -= CAPACITANCE_OFFSET;                      // remove offset
-  measurements.add(constrain(rawresult, -500, 2000));   // sanitize and remove further outliers with median
+  measurements.add(constrain(rawresult-CAPACITANCE_OFFSET, -500, 2000));           // remove offset and then sanitize and remove further outliers with median
+  rainintensity = (int)(10*sqrt(max(measurements.getMedian(),(float)0.0)))-COMPOFFSET;  // make range feel more linear      
 
   // -- start discharging capacitor preparing it for next measurement --  
   pinMode(GPIO_CAPACITOR, OUTPUT);
@@ -192,36 +193,30 @@ void heater_off(void) {
 void handlewebpage(void){
 
   snprintf( webpage, WEBPAGESIZE, " \
-  <html><head><meta http-equiv=refresh content=1></head><body><pre>\n \
-  Wifi signal:      %5d dB \n \
-  Hostname:           %s   \n \
-                           \n \
-  Mqtt server:        %s   \n \
-  Connected:          %d   \n \
-  HA name:            %s   \n \
-  HA uniq_id:         %s   \n \
-                           \n \
-  Raw result:       %5d    \n \
-  Median:           %5d    \n \
-                           \n \
-  Rainintensity:    %5d    \n \
+  <html><head><meta http-equiv=refresh content=3></head><body><pre>\n \
+  Hostname:           %s    \n \
+  Wifi signal:      %5d dB  \n \
+                            \n \
+  Mqtt server:        %s    \n \
+  Connected:          %d    \n \
+  HA name:            %s    \n \
+  HA uniq_id:         %s    \n \
+                            \n \
+                            \n \
+  When fully dry take a value from below and add to config.h to compensate \n \
+  for measurement offsets due to cabling adding extra capacitance \n \
+                            \n \
+  &#35;define CAPACITANCE_OFFSET %d \n \
+                            \n \
+  When correctly set rainintensity should be around zero or slightly \n \
+  below when sensor is fully dry \n \
+                            \n \
+  Rainintensity:    %5d     \n \
   </pre></body></html> \
-  ", WiFi.RSSI(), hostname, mqttserver, mqttclient.connected(), haName, haUniqid, rawresult, (int)measurements.getMedian(), rainintensity ); 
+  ", hostname, WiFi.RSSI(), mqttserver, mqttclient.connected(), haName, haUniqid, (int)measurements.getAverage()-sq(COMPOFFSET/10)+CAPACITANCE_OFFSET, rainintensity ); 
   server.send(200, "text/html", webpage );
 }
 
-
-
-
-// -------------------------------------------------------------------
-void debugplotter(void) {
-  Serial.print(rawresult);
-  Serial.print("\t");
-  Serial.print((int)measurements.getMedian());
-  Serial.print("\t");
-  Serial.print(rainintensity);
-  Serial.println();
-}
 
 
 
