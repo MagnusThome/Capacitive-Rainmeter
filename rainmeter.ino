@@ -207,17 +207,20 @@ void handlewebpage(void){
   HA uniq_id:   %s \n \
   \n \
   \n \
-  When the board is freshly rebooted and the sensor is fully dry \n \
-  take the value from below and add to config.h \n \
+  When the board is freshly rebooted and the sensor is \n \
+  dry take the value from below and add to config.h \n \
   \n \
   <span style=\"color:#0c0;font-weight:bold;\">&#35;define CAPACITANCE_OFFSET %d </span>\n \
+  \n \
   \n \
   Currently entered in config.h: \n \
   \n \
   <span style=\"color:#00e;font-weight:bold;\">&#35;define CAPACITANCE_OFFSET %d </span>\n \
   \n \
-  If the value of CAPACITANCE_OFFSET in config.h is set too low the reported \n \
-  rainintensity value will occasionally rise above zero even whith no rain\n \
+  \n \
+  If the value of CAPACITANCE_OFFSET in config.h is set \n \
+  slightly too low the reported rainintensity value will \n \
+  occasionally rise above zero even whith no rain \n \
   \n \
   Current rainintensity: %d \n \
   </pre></body></html> \
