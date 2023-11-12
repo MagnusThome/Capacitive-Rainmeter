@@ -195,8 +195,6 @@ void handlewebpage(void){
   static int max_rain = 0;
 
   max_offset = max((int)measurements.getMedian()+CAPACITANCE_OFFSET, max_offset);
-  max_rain = max(rainintensity, max_rain);
- 
 
   snprintf( webpage, WEBPAGESIZE, " \
   <html><head><meta http-equiv=refresh content=3></head><body><pre>\n \
@@ -209,8 +207,8 @@ void handlewebpage(void){
   HA uniq_id:   %s \n \
   \n \
   \n \
-  When the board is freshly rebooted and the sensor is \n \
-  fully dry take the value from below and add to config.h \n \
+  When the board is freshly rebooted and the sensor is fully dry \n \
+  take the value from below and add to config.h \n \
   \n \
   <span style=\"color:#0c0;font-weight:bold;\">&#35;define CAPACITANCE_OFFSET %d </span>\n \
   \n \
@@ -218,13 +216,12 @@ void handlewebpage(void){
   \n \
   <span style=\"color:#00e;font-weight:bold;\">&#35;define CAPACITANCE_OFFSET %d </span>\n \
   \n \
-  When the offset is correctly set the rainintensity should stay \n \
-  at zero as long as the sensor has stayed fully dry \n \
+  If the value of CAPACITANCE_OFFSET in config.h is set too low the reported \n \
+  rainintensity value will occasionally rise above zero even whith no rain\n \
   \n \
   Current rainintensity: %d \n \
-  Max rainintensity:     %d \n \
   </pre></body></html> \
-  ", hostname, WiFi.RSSI(), mqttserver, mqttclient.connected(), haName, haUniqid, max_offset, CAPACITANCE_OFFSET, rainintensity, max_rain ); 
+  ", hostname, WiFi.RSSI(), mqttserver, mqttclient.connected(), haName, haUniqid, max_offset, CAPACITANCE_OFFSET, rainintensity ); 
   server.send(200, "text/html", webpage );
 }
 
