@@ -118,7 +118,7 @@ void measurerain (void) {
   rawresult = (int)(micros()-timerstart);
 
   // Repackage result
-  measurements.add(constrain(rawresult-CAPACITANCE_OFFSET, -500, 2000));      // remove offset and then sanitize and remove further outliers with median
+  measurements.add(constrain(rawresult-CAPACITANCE_OFFSET, -500, 5000));      // remove offset and then sanitize and remove further outliers with median
   rainintensity = (int)(10*cbrt(max(measurements.getMedian(),(float)0.0)));   // make range feel more linear      
 
   // -- start discharging capacitor preparing it for next measurement --  
