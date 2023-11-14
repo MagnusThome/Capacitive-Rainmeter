@@ -25,6 +25,8 @@ Why a capacitive sensor? I've previously used those common resistive sensors tha
 
 
 
+![image](https://github.com/MagnusThome/Capacitive-Rainmeter/assets/32169384/e9ea9603-9da6-4906-bcef-7d26ac795914)
+
 ![sensor](https://github.com/MagnusThome/Capacitive-Rainmeter/assets/32169384/523c88bf-ae12-401c-bdff-ebb91b518667)
 
 ![sensor back](https://github.com/MagnusThome/Capacitive-Rainmeter/assets/32169384/43c9af0f-6f9f-44c0-93ee-2d97a060bb8d)
