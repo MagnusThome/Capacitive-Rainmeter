@@ -36,11 +36,11 @@ void setup() {
   Serial.begin(115200);
   Serial.setTxTimeoutMs(0); // prevent slow serial prints if no usb
   
-  pinMode(GPIO_1MOHM, INPUT);
   pinMode(GPIO_HEATER, OUTPUT);
   pinMode(BLUE_LED, OUTPUT);
   pinMode(YELLOW_LED, OUTPUT);
 
+  pinMode(GPIO_1MOHM, INPUT);
   pinMode(GPIO_CAPACITOR, OUTPUT);
   digitalWrite(GPIO_CAPACITOR, LOW);    // discharge the capacitor preparing it for the first measurement
 
@@ -93,8 +93,6 @@ void loop() {
   if (now - timerthree >= 60000) {  // every 60s
     timerthree = now;
     mqttsend(rainintensity); 
-//    mqttsend(max(rainintensity,0));  // set floor to zero
-    Serial.println(rainintensity);
   }
 }
 
@@ -118,7 +116,7 @@ void measurerain (void) {
   rawresult = (int)(micros()-timerstart);
 
   // Repackage result
-  measurements.add(constrain(rawresult-CAPACITANCE_OFFSET, -500, 5000));      // remove offset and then sanitize and remove further outliers with median
+  measurements.add(constrain(rawresult-CAPACITANCE_OFFSET, -500, 5000));      // remove offset and then sanitize and remove further outliers with median array
   rainintensity = (int)(10*cbrt(max(measurements.getMedian(),(float)0.0)));   // make range feel more linear      
 
   // -- start discharging capacitor preparing it for next measurement --  
@@ -160,6 +158,7 @@ void mqttsend (int rain) {
   }
   snprintf( mqttbuff, MQTTBUFFSIZE, "%d", rain );
   mqttclient.publish("homeassistant/sensor/rainmeter/state", mqttbuff);
+  Serial.println(mqttbuff);
 }
 
 
