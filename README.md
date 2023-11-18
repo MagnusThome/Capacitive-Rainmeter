@@ -5,6 +5,7 @@ The code uses mqtt to send data and also self register the sensor in Homeassista
 
 ## Sensor:
 
+__Capacitive Rain Sensor RC-SPC1K__  
 https://radiocontrolli.eu/Capacitive-Rain-Sensor-RC-SPC1K-p242943346
 
 The sensor heater runs on 12V so that is the voltage you need to supply. Any ESP32 will really do but since you need to run this on 12V you need a DC-DC buck converter to power the ESP32 at 5V.  I instead chose my own RejsaCAN board since it has an on board DC-DC buck converter that can run the board on 4-24V. Pretty neat one board solution with it, I just added a few components to interface the ESP32-S3 with the rain sensor board. It felt a bit backwards to have an (unused) CAN bus port on the board, but a built in DC-DC buck converter made the choice easy since I had some extra of these boards lying around.
@@ -25,15 +26,9 @@ Why a capacitive sensor? I've previously used those common resistive sensors tha
 
 
 
+![kit](https://github.com/MagnusThome/Capacitive-Rainmeter/assets/32169384/79b76135-ba25-49dc-8c92-0bc4a8b4002f)
+
 ![image](https://github.com/MagnusThome/Capacitive-Rainmeter/assets/32169384/e9ea9603-9da6-4906-bcef-7d26ac795914)
-
-![sensor](https://github.com/MagnusThome/Capacitive-Rainmeter/assets/32169384/523c88bf-ae12-401c-bdff-ebb91b518667)
-
-![sensor back](https://github.com/MagnusThome/Capacitive-Rainmeter/assets/32169384/43c9af0f-6f9f-44c0-93ee-2d97a060bb8d)
-
-![pcb top](https://github.com/MagnusThome/Capacitive-Rainmeter/assets/32169384/10883a02-48e6-4aa7-8237-53d67ebee8c7)
-
-![pcb bottom](https://github.com/MagnusThome/Capacitive-Rainmeter/assets/32169384/91772012-e3ac-4dbb-a83b-0edec26c4971)
 
 ![arm closed](https://github.com/MagnusThome/Capacitive-Rainmeter/assets/32169384/fd34311f-c391-4b5f-9df3-93f9d417c394)
 
@@ -41,6 +36,6 @@ Why a capacitive sensor? I've previously used those common resistive sensors tha
 
 ![esp32-box](https://github.com/MagnusThome/Capacitive-Rainmeter/assets/32169384/ed867767-c6a1-400a-98c2-c41546993336)
 
-![kit](https://github.com/MagnusThome/Capacitive-Rainmeter/assets/32169384/79b76135-ba25-49dc-8c92-0bc4a8b4002f)
+![pcb top](https://github.com/MagnusThome/Capacitive-Rainmeter/assets/32169384/10883a02-48e6-4aa7-8237-53d67ebee8c7)
 
 ![schema](https://github.com/MagnusThome/Capacitive-Rainmeter/assets/32169384/2cf65521-ba4e-4b0e-887e-84a0da4d858c)
