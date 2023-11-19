@@ -137,9 +137,6 @@ bool mqttConnect(void) {
   if (mqttclient.connect(hostname, mqtt_username, mqtt_password)) {
     digitalWrite(BLUE_LED, HIGH);
     Serial.println(" done!");
-    snprintf( mqttbuff, MQTTBUFFSIZE, "{\"~\":\"homeassistant/sensor/rainmeter\",\"name\":\"%s\",\"unique_id\":\"%s\",\"device_class\":\"precipitation_intensity\",\"stat_t\":\"~/state\"}", haName, haUniqid); 
-    mqttclient.publish("homeassistant/sensor/rainmeter/config", mqttbuff);
-    Serial.println(mqttbuff);
     return true;
   } 
   digitalWrite(BLUE_LED, LOW);
@@ -156,6 +153,9 @@ void mqttsend (int rain) {
   if (!mqttclient.connected()) {
     mqttConnect();
   }
+  snprintf( mqttbuff, MQTTBUFFSIZE, "{\"~\":\"homeassistant/sensor/rainmeter\",\"name\":\"%s\",\"unique_id\":\"%s\",\"device_class\":\"precipitation_intensity\",\"stat_t\":\"~/state\"}", haName, haUniqid); 
+  mqttclient.publish("homeassistant/sensor/rainmeter/config", mqttbuff);
+  Serial.println(mqttbuff);
   snprintf( mqttbuff, MQTTBUFFSIZE, "%d", rain );
   mqttclient.publish("homeassistant/sensor/rainmeter/state", mqttbuff);
   Serial.println(mqttbuff);
