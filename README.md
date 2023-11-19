@@ -22,7 +22,7 @@ Parts used:
   
 ## Things to find out
 
-- Should the sensor be mounted 100% horizontal or should it be tilted slightly? Will how it is mounted change if rain accumulates and stays long after it has stopped raining? Currently it is mounted a bit slanted and it seems to work very well..
+- Should the sensor be mounted 100% horizontal or should it be tilted slightly? Will how it is mounted change if rain accumulates and stays long after it has stopped raining? Or does the heater handle that with my currently set temperature? Currently it is mounted a bit slanted and it seems to work very well..
 
 - What temperature is best for the sensor's built in heater to run at? I guess the optimal is when it is warm enough to help dry off rain so when the rain stops the sensor will report "no rain" in a decent amount of time?
 
