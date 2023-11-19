@@ -8,7 +8,7 @@ The code uses mqtt to send data and also self register the sensor in Homeassista
 __Capacitive Rain Sensor RC-SPC1K__  
 https://radiocontrolli.eu/Capacitive-Rain-Sensor-RC-SPC1K-p242943346
 
-The sensor heater runs on 12V so that is the voltage you need to supply. Any ESP32 board will do but since you need to run this on 12V you normally need a DC-DC buck converter to power the ESP32 at 5V. But they are cheap and easy to find. I happened to have an ESP32-S3 board that can run on 12V natively so I just added a few components to interface with the rain sensor. A true high tech schematic is included below on how to connect the different GPIOs, also see the config.h file where you can specify what goes where. 
+The sensor heater runs on 12V so that is the voltage you need to supply. Any ESP32 board will do but since you need to run this on 12V you normally need a DC-DC buck converter to power the ESP32 at 5V. But these converters are cheap and easy to find. I happened to have an ESP32-S3 board that can run on 12V natively so I just added a few components to interface with the rain sensor. A true high tech schematic is included below on how to connect the different GPIOs, also see the config.h file where you can specify what goes where. 
 
 The code as it is now keeps the sensor at around 45 degrees Celsius. I don't know if that's the optimal temperature to for example keep snow melting and dry off rain not too fast and not too slow. I have a sensor installed and log it in Homeassistant and I might tweak the code during the winter.
 
