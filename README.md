@@ -13,7 +13,13 @@ The sensor heater runs on 12V so that is the voltage you need to supply. Any ESP
 The code as it is now keeps the sensor at around 45 degrees Celsius. I don't know if that's the optimal temperature to for example keep snow melting and dry off rain not too fast and not too slow. I have a sensor installed and log it in Homeassistant and I might tweak the code during the winter.
 
 Why a capacitive sensor? I've previously used those common resistive sensors that have copper traces that the rain falls on. The problem is that these boards tend to wear down after a while due to oxidization. There are tricks to minimize the problems, reducing the current and the time current is flowing, but in the end you still have metal and electrical current in a harsh environment. But a capacitive sensor is totally electrically isolated from the rain and dampness. No external parts of metal. This removes problems with wear or tear in an outdoor environment.   
-
+  
+Parts used:  
+  
+- NPN transistor (I used a 2N2222A because I had one and it can handle the current of a bit under one ampere)  
+- Two 1Kohm resistors  
+- One 1Mohm resistor  
+  
 ## Things to find out
 
 - Should the sensor be mounted 100% horizontal or should it be tilted slightly? Will how it is mounted change if rain accumulates and stays long after it has stopped raining? Currently it is mounted a bit slanted and it seems to work very well..
@@ -34,8 +40,5 @@ Why a capacitive sensor? I've previously used those common resistive sensors tha
 ![esp32-box](https://github.com/MagnusThome/Capacitive-Rainmeter/assets/32169384/ed867767-c6a1-400a-98c2-c41546993336)
 
 ![pcb top](https://github.com/MagnusThome/Capacitive-Rainmeter/assets/32169384/10883a02-48e6-4aa7-8237-53d67ebee8c7)
-
-
-Transistor is a 2N2222A because I had one.
-
+  
 ![schema](https://github.com/MagnusThome/Capacitive-Rainmeter/assets/32169384/0baf334a-89e0-46e6-a923-def7d31eb94a)
