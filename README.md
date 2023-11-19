@@ -8,22 +8,19 @@ The code uses mqtt to send data and also self register the sensor in Homeassista
 __Capacitive Rain Sensor RC-SPC1K__  
 https://radiocontrolli.eu/Capacitive-Rain-Sensor-RC-SPC1K-p242943346
 
-The sensor heater runs on 12V so that is the voltage you need to supply. Any ESP32 will really do but since you need to run this on 12V you need a DC-DC buck converter to power the ESP32 at 5V.  I instead chose my own RejsaCAN board since it has an on board DC-DC buck converter that can run the board on 4-24V. Pretty neat one board solution with it, I just added a few components to interface the ESP32-S3 with the rain sensor board. It felt a bit backwards to have an (unused) CAN bus port on the board, but a built in DC-DC buck converter made the choice easy since I had some extra of these boards lying around.
+The sensor heater runs on 12V so that is the voltage you need to supply. Any ESP32 board will do but since you need to run this on 12V you need a DC-DC buck converter to power the ESP32 at 5V. But they are cheap and easy to find. I happened to have some extra of my own RejsaCAN boards that can run on 12V so I just added a few components to interface the rain sensor board to the ESP32-S3 on it. A true high tech schematic is included below ;-) It felt a bit backwards to have an (unused) CAN bus port on the board though, but hey, it was available in one of my drawers.
 
-The code as it is now keeps the sensor at around 45 degrees Celsius. I don't know if that's the optimal temperature to for example keep snow melting and dry off rain not too fast and not too slow. I have a sensor installed and log it in Homeassistant and I might tweak the code as time goes by.
+The code as it is now keeps the sensor at around 45 degrees Celsius. I don't know if that's the optimal temperature to for example keep snow melting and dry off rain not too fast and not too slow. I have a sensor installed and log it in Homeassistant and I might tweak the code during the winter.
 
 Why a capacitive sensor? I've previously used those common resistive sensors that have copper traces that the rain falls on. The problem is that these boards tend to wear down after a while due to oxidization. There are tricks to minimize the problems, reducing the current and the time current is flowing, but in the end you still have metal and electrical current in a harsh environment. But a capacitive sensor is totally electrically isolated from the rain and dampness. No external parts of metal. This removes problems with wear or tear in an outdoor environment.   
 
 ## Things to find out
 
-- Should the sensor be mounted 100% horizontal or should it be tilted slightly? Will how it is mounted change if rain accumulates and stays long after it has stopped raining?
+- Should the sensor be mounted 100% horizontal or should it be tilted slightly? Will how it is mounted change if rain accumulates and stays long after it has stopped raining? Currently it is mounted a bit slanted and it seems to work very well..
 
-- What sensor temperature is best? I guess the optimal is when it is warm enough to help dry off rain so when the rain stops the sensor will report "no rain" in a decent amount of time?
+- What temperature is best for the sensor's built in heater to run at? I guess the optimal is when it is warm enough to help dry off rain so when the rain stops the sensor will report "no rain" in a decent amount of time?
 
-- Is the reported value very unlinear? I suspect it might be. If a very slight drizzle is 100 but heavy rain is 10 000 I need to convert the output to be more linear.
-
-- work in progress....
-
+- The reported value seems a bit unlinear to what I see as heavy rain and drizzle and everything in between. But I have added some code for this, it "feels" quite reasonable so far but it might need some tweaking down the line?
 
 
 ![kit](https://github.com/MagnusThome/Capacitive-Rainmeter/assets/32169384/79b76135-ba25-49dc-8c92-0bc4a8b4002f)
