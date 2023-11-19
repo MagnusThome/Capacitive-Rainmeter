@@ -35,4 +35,7 @@ Why a capacitive sensor? I've previously used those common resistive sensors tha
 
 ![pcb top](https://github.com/MagnusThome/Capacitive-Rainmeter/assets/32169384/10883a02-48e6-4aa7-8237-53d67ebee8c7)
 
+
+Transistor is a 2N2222A because I had one.
+
 ![schema](https://github.com/MagnusThome/Capacitive-Rainmeter/assets/32169384/0baf334a-89e0-46e6-a923-def7d31eb94a)
