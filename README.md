@@ -1,7 +1,7 @@
 # Capacitive-Rainmeter
 Measure rain intensity in Homeassistant with a capacitive sensor 
 
-The code uses mqtt to send data and also self register the sensor in Homeassistant. 
+The code uses mqtt to send data and also self-register the sensor in Homeassistant. 
 
 ## Sensor:
 
