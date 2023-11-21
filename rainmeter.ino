@@ -33,7 +33,9 @@ RunningMedian measurements = RunningMedian(RUNNING_MEDIANS);
 // -------------------------------------------------------------------
 void setup() {
   Serial.begin(115200);
-  Serial.setTxTimeoutMs(0);             // prevent slow serial prints on some ESP32 variants if no usb connected. Comment out for basic ESP32 variants
+                                
+//  Serial.setTxTimeoutMs(0);   // comment out for basic ESP32 variants with no on chip USB
+                                // prevents slow serial prints on some ESP32 variants if on chip usb is connected but no terminal running
   
   pinMode(GPIO_HEATER, OUTPUT);
   pinMode(BLUE_LED, OUTPUT);
