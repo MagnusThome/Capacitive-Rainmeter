@@ -9,7 +9,6 @@
 
 
 #define ANALOG_FULL_RANGE   4096
-#define HEAT_LEVEL          2800    // 2500 ca 35 degrees celsius  //  2800 ca 45 degrees celsius
 #define HEAT_HYSTERESIS     25
 
 
