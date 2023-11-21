@@ -13,6 +13,8 @@ const char* ota_password = "xxxxxx";
 const char* haName   = "Rainmeter";
 const char* haUniqid = "rainmeter01";
 
+#define HEAT_LEVEL          2800    // 2500 ca 35 degrees celsius  //  2800 ca 45 degrees celsius
+
 #define CAPACITANCE_OFFSET  200     // Set so the reported rainintensity stays at zero when the sensor is dry
                                     // Go to the device's local web page to get help finding the correct value
 #define BLUE_LED        10
