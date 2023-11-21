@@ -16,6 +16,8 @@ The sensor's heater runs on 12V so that is the voltage you need to supply to you
 <img align=right width=50% src=https://github.com/MagnusThome/Capacitive-Rainmeter/assets/32169384/79b76135-ba25-49dc-8c92-0bc4a8b4002f>  
 The code as it is now keeps the sensor at around 45 degrees Celsius by sensing the NTC resistor value and turning the heater on and off (with a transistor) quite quickly around a small temperature hysteresis. Just how it has been done since the stone age. I don't know if I've set it to its optimal temperature, to for example keep snow melting and also drying off rain not too fast and not too slow. I have a sensor installed and I log it in Homeassistant and I might tweak the code during the winter.  
 <br><br>  
+The mesurement of the capacitance is done by first making sure the capacitor/sensor is fully discharged by pulling the GPIO pin connected to it to ground. Then that pin is turned to a high impedance input and another pin goes high and starts charging the capacitor slowly through a 1Mohm resistor while the first pin is measuring the rising voltage directly on the capacitor. When the voltage reaches 63% of the full voltage the time between the start and stop of this charging sequence is saved. Teh larger the capacitance, when rainging, the longer the charging time. 
+<br><br>  
 Parts used:  
   
 - NPN transistor (I used a 2N2222A because I had one and it can handle the current of a bit under one ampere)  
