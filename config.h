@@ -22,5 +22,5 @@ const char* haUniqid = "rainmeter01";
 
 #define GPIO_NTC        1           // Needs to be a GPIO pin that has ADC capabilites
 #define GPIO_HEATER     48
-#define GPIO_CAPACITOR  2
+#define GPIO_CAPACITOR  2           // Needs to be a GPIO pin that has ADC capabilites
 #define GPIO_1MOHM      41
