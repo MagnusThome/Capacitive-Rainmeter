@@ -33,7 +33,7 @@ RunningMedian measurements = RunningMedian(RUNNING_MEDIANS);
 // -------------------------------------------------------------------
 void setup() {
   Serial.begin(115200);
-  Serial.setTxTimeoutMs(0); // prevent slow serial prints if no usb
+  Serial.setTxTimeoutMs(0);             // prevent slow serial prints on some ESP32 variants if no usb connected
   
   pinMode(GPIO_HEATER, OUTPUT);
   pinMode(BLUE_LED, OUTPUT);
@@ -50,7 +50,7 @@ void setup() {
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
-    if (millis()>60000) { // NO CONNECTION AFTER 60 SECONDS, REBOOT AND RETRY
+    if (millis()>60000) {              // still no connection after one minute, reboot and retry
       ESP.restart();
     }
   }
@@ -104,10 +104,10 @@ void measurerain (void) {
   
   heater_off();  // prevent overheating if stuck in the while loop below
 
-  // -- stop discharging the now discharged capacitor by making gpio high impedance --
+  // -- stop discharging the now fully discharged capacitor by making gpio high impedance --
   pinMode(GPIO_CAPACITOR, INPUT); 
 
-  // -- start charging capacitor and measure time to charge it to 63% --  
+  // -- start charging the capacitor and measure the time to charge it to 63% --  
   pinMode(GPIO_1MOHM, OUTPUT);
   digitalWrite(GPIO_1MOHM, HIGH);
   timerstart = micros();
@@ -115,10 +115,10 @@ void measurerain (void) {
   rawresult = (int)(micros()-timerstart);
 
   // Repackage result
-  measurements.add(constrain(rawresult-CAPACITANCE_OFFSET, -500, 5000));      // remove offset and then sanitize and remove further outliers with median array
+  measurements.add(constrain(rawresult-CAPACITANCE_OFFSET, -500, 5000));      // remove offset and sanitize and then smooth and remove further outliers with the median array
   rainintensity = (int)(10*cbrt(max(measurements.getMedian(),(float)0.0)));   // make range feel more linear      
 
-  // -- start discharging capacitor preparing it for next measurement --  
+  // -- start discharging capacitor preparing it for the next measurement --  
   pinMode(GPIO_CAPACITOR, OUTPUT);
   digitalWrite(GPIO_CAPACITOR, LOW);
 }
