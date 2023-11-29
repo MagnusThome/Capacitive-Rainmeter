@@ -34,8 +34,8 @@ RunningMedian measurements = RunningMedian(RUNNING_MEDIANS);
 void setup() {
   Serial.begin(115200);
                                 
-//  Serial.setTxTimeoutMs(0);   // comment out for basic ESP32 variants with no on chip USB
-                                // prevents slow serial prints on some ESP32 variants if on chip usb is connected but no terminal running
+  Serial.setTxTimeoutMs(0);   // comment out for basic ESP32 variants with no on chip USB
+                              // prevents slow serial prints on some ESP32 variants if CDC on boot is enabled, usb is connected but no terminal running
   
   pinMode(GPIO_HEATER, OUTPUT);
   pinMode(BLUE_LED, OUTPUT);
@@ -168,7 +168,7 @@ void mqttsend (int rain) {
 // -------------------------------------------------------------------
 void heatercontrol(void) {    
   int temperature = ANALOG_FULL_RANGE-analogRead(GPIO_NTC);
-  if (temperature < HEAT_LEVEL) {
+  if (temperature < HEAT_LEVEL && rainintensity>0) {    // only heat up the sensor if it detects rain or snow
       heater_on();
   }
   if (temperature > HEAT_LEVEL+HEAT_HYSTERESIS) {
